@@ -7,6 +7,7 @@ and Canvas **1.35.0**.
 
 - [Install the adapter and launch a MicroVM](docs/SETUP.md)
 - [Interfaces, design choices, and ways to change them](docs/INTERFACES.md)
+- [Build the pinned Canvas Pause demo](canvas/README.md)
 - [Validate Pause and reopen, and clean up](docs/VALIDATION.md)
 
 The package includes the [Enterprise provider modules](enterprise/overlay/),

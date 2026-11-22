@@ -6,7 +6,7 @@
   "resume_semantics": "same-process",
   "evidence": {
     "api": "Current package passed patch, Compose render, and AWS request model checks. Native lifecycle and 25/50-VM cohorts were verified on earlier deployment files.",
-    "canvas": "Earlier pilot verified Pause and same-process preview reopen using a patched Canvas 1.35.0 build. Fresh installation of this package is untested.",
+    "canvas": "The included Canvas patch builds from the pinned source. The earlier Canvas pilot recovered the original live preview and process state. A live run combining this AWS package and the pinned Canvas build is pending.",
     "expiry": "Earlier pilot used a separate checkpoint overlay to recover the workspace and chat. This package ends at native Lambda suspension and resume."
   }
 }

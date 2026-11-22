@@ -101,6 +101,10 @@ docker compose --env-file .env --env-file lambda.env \
 ```
 
 Confirm that the Sandbox V1 spec catalog lists `lambda-agent-server`.
+For the Pause button and same-conversation test, build and mount the
+[pinned Canvas pilot](../canvas/README.md). The AWS adapter in this package
+already advertises runtime Pause.
+
 Start an authorized Canvas conversation bound to that spec and perform the
 [acceptance check](VALIDATION.md).
 

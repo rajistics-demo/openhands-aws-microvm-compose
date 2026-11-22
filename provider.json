@@ -1,0 +1,12 @@
+{
+  "contract_version": 1,
+  "provider": "aws",
+  "package": "openhands-aws-microvm-compose",
+  "native_enterprise": "implemented",
+  "resume_semantics": "same-process",
+  "evidence": {
+    "api": "Isolated Enterprise 1.88.0 native lifecycle and 25/50 benchmark verified.",
+    "canvas": "Pause and same-process preview reopen were verified in Canvas 1.35.0.",
+    "expiry": "Pilot restored one real public Git workspace and chat after AWS termination on a replacement VM."
+  }
+}

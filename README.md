@@ -20,4 +20,4 @@ changes.
 Earlier isolated pilots exercised native conversation starts, pause and resume,
 working previews, and cohorts of 25 and 50 VMs. This installer is packaged
 from that adapter. Its validation and differences from those demos are in
-the [test guide](docs/VALIDATION.md).
+the [test guide](docs/VALIDATION.md) and [provider status record](provider.json).

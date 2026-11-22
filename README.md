@@ -22,3 +22,17 @@ Earlier isolated pilots exercised native conversation starts, pause and resume,
 working previews, and cohorts of 25 and 50 VMs. This installer is packaged
 from that adapter. Its validation and differences from those demos are in
 the [test guide](docs/VALIDATION.md) and [provider status record](provider.json).
+
+## Sandbox Spec compatibility
+
+The AWS adapter uses the Enterprise Sandbox Spec catalog. Its
+`lambda-agent-server` spec maps to the configured AWS Lambda MicroVM image
+and pinned version.
+
+Enterprise’s Sandbox Spec selector and Agent Profile references use the
+same ID contract when those features are available in the Enterprise
+release. Kubernetes uses that contract to refer to a named runtime
+configuration. This Compose package activates a single sandbox backend.
+Offering Kubernetes and microVMs in one installation still requires
+routing new launches to the selected provider and routing existing
+conversations through their saved sandbox binding.

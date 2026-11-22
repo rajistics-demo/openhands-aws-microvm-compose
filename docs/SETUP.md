@@ -101,6 +101,8 @@ docker compose --env-file .env --env-file lambda.env \
 ```
 
 Confirm that the Sandbox V1 spec catalog lists `lambda-agent-server`.
+Pass that ID as the `sandbox_spec_id` query parameter on
+`POST /api/v1/sandboxes` to select the environment explicitly.
 For the Pause button and same-conversation test, build and mount the
 [pinned Canvas pilot](../canvas/README.md). The AWS adapter in this package
 already advertises runtime Pause.

@@ -1,0 +1,42 @@
+# For a fresh isolated instance using the stock 1.88.0 HTTPS/Caddy overlay.
+# Omit this file when installing equivalent rules on an existing trusted edge.
+services:
+  https:
+    networks:
+      default:
+        aliases:
+          - ${WEB_HOST}
+          - ${LAMBDA_RUNTIME_HOST}
+          - ${LAMBDA_CALLBACK_HOST}
+
+configs:
+  https-caddyfile:
+    content: |
+      ${WEB_HOST} {
+        @operator remote_ip ${LAMBDA_OPERATOR_CIDR:?Set a trusted operator CIDR}
+        handle @operator {
+          reverse_proxy proxy:80
+        }
+        respond 403
+      }
+      ${LAMBDA_RUNTIME_HOST} {
+        @operator remote_ip ${LAMBDA_OPERATOR_CIDR}
+        handle @operator {
+          reverse_proxy lambda-proxy:8080
+        }
+        respond 403
+      }
+      ${LAMBDA_CALLBACK_HOST} {
+        @callback {
+          method POST
+          path /api/v1/webhooks/conversations /api/v1/webhooks/events/*
+          header X-Session-API-Key *
+        }
+        handle @callback {
+          request_body {
+            max_size 16MB
+          }
+          reverse_proxy app:3000
+        }
+        respond 404
+      }

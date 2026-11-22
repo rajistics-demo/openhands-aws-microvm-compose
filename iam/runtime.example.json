@@ -1,0 +1,22 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "lambda:RunMicrovm",
+        "lambda:GetMicrovm",
+        "lambda:CreateMicrovmAuthToken",
+        "lambda:SuspendMicrovm",
+        "lambda:ResumeMicrovm",
+        "lambda:TerminateMicrovm"
+      ],
+      "Resource": "MICROVM_IMAGE_ARN"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "lambda:PassNetworkConnector",
+      "Resource": "arn:aws:lambda:AWS_REGION:aws:network-connector:aws-network-connector:HTTP_INGRESS"
+    }
+  ]
+}

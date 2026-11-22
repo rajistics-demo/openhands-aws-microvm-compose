@@ -1,0 +1,84 @@
+# Layer after the OpenHands Enterprise 1.88.0 stock Compose file.
+x-lambda-environment: &lambda-environment
+  AWS_REGION: ${AWS_REGION:?Select the Lambda MicroVM region}
+  AWS_SHARED_CREDENTIALS_FILE: /run/aws/credentials
+  AWS_EC2_METADATA_DISABLED: "true"
+  AWS_DEFAULT_REGION: ${AWS_REGION}
+  LAMBDA_MICROVM_IMAGE_ARN: ${LAMBDA_MICROVM_IMAGE_ARN:?Select a Lambda MicroVM image}
+  LAMBDA_MICROVM_IMAGE_VERSION: ${LAMBDA_MICROVM_IMAGE_VERSION:?Pin an active image version}
+  LAMBDA_MICROVM_INIT_API_KEY_FILE: /run/aws/init-key
+  LAMBDA_MICROVM_PROXY_URL: https://${LAMBDA_RUNTIME_HOST:?Set a dedicated HTTPS runtime hostname}
+  LAMBDA_MICROVM_CALLBACK_URL: https://${LAMBDA_CALLBACK_HOST:?Set an HTTPS callback hostname}
+  OH_SANDBOX_WEB_URL: https://${LAMBDA_CALLBACK_HOST}
+  OH_SANDBOX_KIND: openhands.app_server.sandbox.lambda_microvm_service.LambdaMicrovmServiceInjector
+  OH_SANDBOX_SPEC_KIND: openhands.app_server.sandbox.lambda_microvm_spec_service.LambdaMicrovmSpecServiceInjector
+  OH_SANDBOX_MAXIMUM_DURATION_SECONDS: ${LAMBDA_VM_LIFETIME_SECONDS:-1800}
+  OH_SANDBOX_MAX_NUM_SANDBOXES: ${LAMBDA_SANDBOX_LIMIT:-2}
+  OH_APP_CONVERSATION_SANDBOX_GROUPING_STRATEGY: NO_GROUPING
+  SANDBOX_INTERNAL_URL: http://lambda-proxy:8080
+  OH_SANDBOX_LIFECYCLE_IDLE_SECONDS: "0"
+  OH_SANDBOX_LIFECYCLE_MAX_SESSION_SECONDS: "0"
+  OH_SANDBOX_LIFECYCLE_DELETE_AFTER_SECONDS: "0"
+
+services:
+  app:
+    image: ${LAMBDA_ENTERPRISE_IMAGE:-openhands-lambda-enterprise:1.88.0}
+    environment: *lambda-environment
+    volumes: &lambda-mounts !override
+      - type: bind
+        source: ${LAMBDA_AWS_CREDENTIALS_FILE:?Set a private AWS credentials file path}
+        target: /run/aws/credentials
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${LAMBDA_INIT_KEY_FILE:?Set a private image bootstrap key file path}
+        target: /run/aws/init-key
+        read_only: true
+        bind:
+          create_host_path: false
+      - app-filestore:/.openhands
+  worker:
+    image: ${LAMBDA_ENTERPRISE_IMAGE:-openhands-lambda-enterprise:1.88.0}
+    environment: *lambda-environment
+    volumes: *lambda-mounts
+  lambda-proxy:
+    image: ${LAMBDA_ENTERPRISE_IMAGE:-openhands-lambda-enterprise:1.88.0}
+    user: openhands
+    entrypoint: [uvicorn]
+    command:
+      - openhands.app_server.sandbox.lambda_microvm_proxy:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+      - --no-access-log
+      - --log-level
+      - warning
+    environment:
+      AWS_REGION: ${AWS_REGION}
+      AWS_DEFAULT_REGION: ${AWS_REGION}
+      AWS_SHARED_CREDENTIALS_FILE: /run/aws/credentials
+      AWS_EC2_METADATA_DISABLED: "true"
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-openhands}
+      DB_USER: ${DB_USER:-openhands}
+      DB_PASS: ${DB_PASS:-openhands}
+      REDIS_HOST: redis
+      OH_DEPLOYMENT_MODE: self_hosted
+      OH_APP_MODE: saas
+      RUN_MIGRATIONS_ON_STARTUP: "false"
+    volumes:
+      - type: bind
+        source: ${LAMBDA_AWS_CREDENTIALS_FILE}
+        target: /run/aws/credentials
+        read_only: true
+        bind:
+          create_host_path: false
+      - app-filestore:/.openhands
+    expose: ["8080"]
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
